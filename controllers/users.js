@@ -12,3 +12,7 @@ exports.createUser = async (req, res) => {
   const { name, about, avatar } = req.body;
   res.status(201).send(await User.create({ name, about, avatar }));
 };
+exports.updateUser = async (req, res) => {
+  const { name, about } = req.body;
+  res.status(201).send(await User.findByIdAndUpdate(req.user.id, { name, about }));
+};
