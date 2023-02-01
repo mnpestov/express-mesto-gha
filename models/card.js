@@ -31,4 +31,4 @@ const cardSchema = new mongoose.Schema({
   },
 });
 
-exports.User = mongoose.model('card', cardSchema);
+exports.Card = mongoose.model('card', cardSchema);
