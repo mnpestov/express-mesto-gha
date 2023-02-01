@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const { routes } = require('./routes');
 
 const app = express();
 
@@ -13,9 +14,7 @@ const { PORT = 3000 } = process.env;
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('hello');
-});
+app.use(routes);
 
 app.listen(PORT, () => {
   console.log('server');
