@@ -1,7 +1,6 @@
 const { User } = require('../models/user');
 
 exports.getUsers = async (req, res) => {
-  // res.status(200).send('ok');
   const users = await User.find({});
   res.status(200).send(users);
 };
