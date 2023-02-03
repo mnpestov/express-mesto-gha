@@ -18,10 +18,18 @@ exports.deleteCard = async (req, res) => {
 exports.putLike = async (req, res) => {
   const likeOwner = req.body.id;
   res.status(201)
-    .send(await Card.findByIdAndUpdate(req.params.Id, ({ $push: { likes: likeOwner } })));
+    .send(await Card.findByIdAndUpdate(
+      req.params.Id,
+      { $addToSet: { likes: likeOwner } },
+      { new: true },
+    ));
 };
 exports.deleteLike = async (req, res) => {
   const likeOwner = req.body.id;
   res.status(201)
-    .send(await Card.findByIdAndUpdate(req.params.Id, ({ $pull: { likes: likeOwner } })));
+    .send(await Card.findByIdAndUpdate(
+      req.params.Id,
+      { $pull: { likes: likeOwner } },
+      { new: true },
+    ));
 };
