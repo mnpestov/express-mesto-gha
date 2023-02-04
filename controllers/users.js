@@ -49,12 +49,12 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { name, about } = req.body;
-    if (!User.findById(req.user.id)) {
+    if (!User.findById(req.user._id)) {
       throw new Error('not found');
     }
     res.status(201)
       .send(await User.findByIdAndUpdate(
-        req.user.id,
+        req.user._id,
         { name, about },
         { new: true, runValidators: true },
       ));
@@ -74,12 +74,12 @@ exports.updateUser = async (req, res) => {
 exports.updateAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    if (!User.findById(req.user.id)) {
+    if (!User.findById(req.user._id)) {
       throw new Error('not found');
     }
     res.status(201)
       .send(await User.findByIdAndUpdate(
-        req.user.id,
+        req.user._id,
         { avatar },
         { new: true, runValidators: true },
       ));
