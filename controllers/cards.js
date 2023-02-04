@@ -1,35 +1,59 @@
 const { Card } = require('../models/card');
 
 exports.getCards = async (req, res) => {
-  const cards = await Card.find({});
-  res.status(200)
-    .send(cards);
+  try {
+    const cards = await Card.find({});
+    res.status(200)
+      .send(cards);
+  } catch (err) {
+    res.status(500).send({ message: 'Ошибка на сервере', ...err });
+  }
 };
 exports.createCard = async (req, res) => {
-  const { name, link } = req.body;
-  const owner = req.user.id;
-  res.status(201)
-    .send(await Card.create({ name, link, owner }));
+  try {
+    const { name, link } = req.body;
+    const owner = req.user.id;
+    res.status(201)
+      .send(await Card.create({ name, link, owner }));
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      res.status(400).send({ message: 'Ошибка валидации полей', ...err });
+    } else {
+      res.status(500).send({ message: 'Ошибка на сервере', ...err });
+    }
+  }
 };
 exports.deleteCard = async (req, res) => {
-  res.status(200)
-    .send(await Card.findByIdAndRemove(req.params.id));
+  try {
+    res.status(200)
+      .send(await Card.findByIdAndRemove(req.params.id));
+  } catch (err) {
+    res.status(500).send({ message: 'Ошибка на сервере', ...err });
+  }
 };
 exports.putLike = async (req, res) => {
-  const likeOwner = req.body.id;
-  res.status(201)
-    .send(await Card.findByIdAndUpdate(
-      req.params.Id,
-      { $addToSet: { likes: likeOwner } },
-      { new: true },
-    ));
+  try {
+    const likeOwner = req.body.id;
+    res.status(201)
+      .send(await Card.findByIdAndUpdate(
+        req.params.Id,
+        { $addToSet: { likes: likeOwner } },
+        { new: true },
+      ));
+  } catch (err) {
+    res.status(500).send({ message: 'Ошибка на сервере', ...err });
+  }
 };
 exports.deleteLike = async (req, res) => {
-  const likeOwner = req.body.id;
-  res.status(201)
-    .send(await Card.findByIdAndUpdate(
-      req.params.Id,
-      { $pull: { likes: likeOwner } },
-      { new: true },
-    ));
+  try {
+    const likeOwner = req.body.id;
+    res.status(201)
+      .send(await Card.findByIdAndUpdate(
+        req.params.Id,
+        { $pull: { likes: likeOwner } },
+        { new: true },
+      ));
+  } catch (err) {
+    res.status(500).send({ message: 'Ошибка на сервере', ...err });
+  }
 };

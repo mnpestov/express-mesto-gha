@@ -30,7 +30,7 @@ exports.createUser = async (req, res) => {
     const { name, about, avatar } = req.body;
     res.status(201).send(await User.create({ name, about, avatar }));
   } catch (err) {
-    if (err.name === 'ValidatorError') {
+    if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Ошибка валидации полей', ...err });
     } else {
       res.status(500).send({ message: 'Ошибка на сервере', ...err });
