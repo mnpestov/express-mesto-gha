@@ -25,15 +25,25 @@ exports.createCard = async (req, res) => {
 };
 exports.deleteCard = async (req, res) => {
   try {
+    if (!(await Card.findById(req.params.Id))) {
+      throw new Error('not found');
+    }
     res.status(200)
-      .send(await Card.findByIdAndRemove(req.params.id));
+      .send(await Card.findByIdAndRemove(req.params.Id));
   } catch (err) {
-    res.status(500).send({ message: 'Ошибка на сервере', ...err });
+    if (err.message === 'not found') {
+      res.status(404).send({ message: 'Карточка с указанным id не найдена.' });
+    } else {
+      res.status(500).send({ message: 'Ошибка на сервере', ...err });
+    }
   }
 };
 exports.putLike = async (req, res) => {
   try {
     const likeOwner = req.body.id;
+    if (!(await Card.findById(req.params.Id))) {
+      throw new Error('not found');
+    }
     res.status(201)
       .send(await Card.findByIdAndUpdate(
         req.params.Id,
@@ -41,12 +51,22 @@ exports.putLike = async (req, res) => {
         { new: true },
       ));
   } catch (err) {
-    res.status(500).send({ message: 'Ошибка на сервере', ...err });
+    if (err.name === 'CastError') {
+      res.status(400)
+        .send({ message: 'Ошибка валидации id', ...err });
+    } else if (err.message === 'not found') {
+      res.status(404).send({ message: 'Карточка с указанным id не найдена.' });
+    } else {
+      res.status(500).send({ message: 'Ошибка на сервере', ...err });
+    }
   }
 };
 exports.deleteLike = async (req, res) => {
   try {
     const likeOwner = req.body.id;
+    if (!(await Card.findById(req.params.Id))) {
+      throw new Error('not found');
+    }
     res.status(201)
       .send(await Card.findByIdAndUpdate(
         req.params.Id,
@@ -54,6 +74,13 @@ exports.deleteLike = async (req, res) => {
         { new: true },
       ));
   } catch (err) {
-    res.status(500).send({ message: 'Ошибка на сервере', ...err });
+    if (err.name === 'CastError') {
+      res.status(400)
+        .send({ message: 'Ошибка валидации id', ...err });
+    } else if (err.message === 'not found') {
+      res.status(404).send({ message: 'Карточка с указанным id не найдена.' });
+    } else {
+      res.status(500).send({ message: 'Ошибка на сервере', ...err });
+    }
   }
 };
