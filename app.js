@@ -20,7 +20,6 @@ async function connect() {
     useNewUrlParser: true,
   });
   await app.listen(PORT);
-  console.log('server');
 }
 
 connect();
