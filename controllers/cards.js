@@ -2,7 +2,7 @@ const { Card } = require('../models/card');
 
 exports.getCards = async (req, res) => {
   try {
-    const cards = await Card.find({});
+    const cards = await Card.find({}).populate(['owner', 'likes']);
     res.status(200)
       .send(cards);
   } catch (err) {
@@ -14,7 +14,7 @@ exports.createCard = async (req, res) => {
     const { name, link } = req.body;
     const owner = req.user._id;
     res.status(201)
-      .send(await Card.create({ name, link, owner }));
+      .send(await Card.create({ name, link, owner }).populate(['owner', 'likes']));
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(400).send({ message: 'Ошибка валидации полей', ...err });
@@ -29,7 +29,7 @@ exports.deleteCard = async (req, res) => {
       throw new Error('not found');
     }
     res.status(200)
-      .send(await Card.findByIdAndRemove(req.params.Id));
+      .send(await Card.findByIdAndRemove(req.params.Id).populate(['owner', 'likes']));
   } catch (err) {
     if (err.message === 'not found') {
       res.status(404).send({ message: 'Карточка с указанным id не найдена.' });
@@ -49,7 +49,7 @@ exports.putLike = async (req, res) => {
         req.params.Id,
         { $addToSet: { likes: likeOwner } },
         { new: true },
-      ));
+      ).populate(['owner', 'likes']));
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400)
@@ -72,7 +72,7 @@ exports.deleteLike = async (req, res) => {
         req.params.Id,
         { $pull: { likes: likeOwner } },
         { new: true },
-      ));
+      ).populate(['owner', 'likes']));
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400)

@@ -52,7 +52,7 @@ exports.updateUser = async (req, res) => {
     if (!User.findById(req.user._id)) {
       throw new Error('not found');
     }
-    res.status(201)
+    res.status(200)
       .send(await User.findByIdAndUpdate(
         req.user._id,
         { name, about },
@@ -77,7 +77,7 @@ exports.updateAvatar = async (req, res) => {
     if (!User.findById(req.user._id)) {
       throw new Error('not found');
     }
-    res.status(201)
+    res.status(200)
       .send(await User.findByIdAndUpdate(
         req.user._id,
         { avatar },
