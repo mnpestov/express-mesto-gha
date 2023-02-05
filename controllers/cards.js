@@ -31,7 +31,10 @@ exports.deleteCard = async (req, res) => {
     res.status(200)
       .send(await Card.findByIdAndRemove(req.params.Id).populate(['owner', 'likes']));
   } catch (err) {
-    if (err.message === 'not found') {
+    if (err.name === 'CastError') {
+      res.status(400)
+        .send({ message: 'Ошибка валидации id', ...err });
+    } else if (err.message === 'not found') {
       res.status(404).send({ message: 'Карточка с указанным id не найдена.' });
     } else {
       res.status(500).send({ message: 'Ошибка на сервере', ...err });
