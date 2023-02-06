@@ -1,12 +1,13 @@
+const httpConstants = require('http2').constants;
 const { User } = require('../models/user');
 
 exports.getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    res.status(200)
+    res.status(httpConstants.HTTP_STATUS_OK)
       .send(users);
   } catch (err) {
-    res.status(500)
+    res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
       .send({ message: 'Ошибка на сервере', ...err });
   }
 };
@@ -16,17 +17,17 @@ exports.getUserById = async (req, res) => {
     if (!userById) {
       throw new Error('not found');
     }
-    res.status(200)
+    res.status(httpConstants.HTTP_STATUS_OK)
       .send(userById);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400)
+      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
         .send({ message: 'Ошибка валидации id', ...err });
     } else if (err.message === 'not found') {
-      res.status(404)
+      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
         .send({ message: 'Пользователь с указанным id не найден', ...err });
     } else {
-      res.status(500)
+      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
         .send({ message: 'Ошибка на сервере', ...err });
     }
   }
@@ -34,14 +35,14 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { name, about, avatar } = req.body;
-    res.status(201)
+    res.status(httpConstants.HTTP_STATUS_CREATED)
       .send(await User.create({ name, about, avatar }));
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400)
+      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
         .send({ message: 'Ошибка валидации полей', ...err });
     } else {
-      res.status(500)
+      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
         .send({ message: 'Ошибка на сервере', ...err });
     }
   }
@@ -52,7 +53,7 @@ exports.updateUser = async (req, res) => {
     if (!User.findById(req.user._id)) {
       throw new Error('not found');
     }
-    res.status(200)
+    res.status(httpConstants.HTTP_STATUS_OK)
       .send(await User.findByIdAndUpdate(
         req.user._id,
         { name, about },
@@ -60,13 +61,13 @@ exports.updateUser = async (req, res) => {
       ));
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400)
+      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
         .send({ message: 'Ошибка валидации полей', ...err });
     } else if (err.message === 'not found') {
-      res.status(404)
+      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
         .send({ message: 'Пользователь с указанным id не найден', ...err });
     } else {
-      res.status(500)
+      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
         .send({ message: 'Ошибка на сервере', ...err });
     }
   }
@@ -77,7 +78,7 @@ exports.updateAvatar = async (req, res) => {
     if (!User.findById(req.user._id)) {
       throw new Error('not found');
     }
-    res.status(200)
+    res.status(httpConstants.HTTP_STATUS_OK)
       .send(await User.findByIdAndUpdate(
         req.user._id,
         { avatar },
@@ -85,13 +86,13 @@ exports.updateAvatar = async (req, res) => {
       ));
   } catch (err) {
     if (err.name === 'ValidationError') {
-      res.status(400)
+      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
         .send({ message: 'Ошибка валидации полей', ...err });
     } else if (err.message === 'not found') {
-      res.status(404)
+      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
         .send({ message: 'Пользователь с указанным id не найден', ...err });
     } else {
-      res.status(500)
+      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
         .send({ message: 'Ошибка на сервере', ...err });
     }
   }
