@@ -50,15 +50,16 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { name, about } = req.body;
-    if (!(await User.findById(req.user._id))) {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true, runValidators: true },
+    );
+    if (!updatedUser) {
       throw new Error('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
-      .send(await User.findByIdAndUpdate(
-        req.user._id,
-        { name, about },
-        { new: true, runValidators: true },
-      ));
+      .send(updatedUser);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
@@ -75,15 +76,16 @@ exports.updateUser = async (req, res) => {
 exports.updateAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    if ((await !User.findById(req.user._id))) {
+    const updatedAvatar = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true, runValidators: true },
+    );
+    if (!updatedAvatar) {
       throw new Error('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
-      .send(await User.findByIdAndUpdate(
-        req.user._id,
-        { avatar },
-        { new: true, runValidators: true },
-      ));
+      .send(updatedAvatar);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)

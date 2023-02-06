@@ -14,8 +14,10 @@ exports.createCard = async (req, res) => {
   try {
     const { name, link } = req.body;
     const owner = req.user._id;
+    const newCard = await Card.create({ name, link, owner });
+    const card = await Card.populate(newCard, 'owner');
     res.status(httpConstants.HTTP_STATUS_CREATED)
-      .send(await Card.create({ name, link, owner }));
+      .send(card);
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({ message: 'Ошибка валидации полей', ...err });
@@ -26,11 +28,12 @@ exports.createCard = async (req, res) => {
 };
 exports.deleteCard = async (req, res) => {
   try {
-    if (!(await Card.findById(req.params.Id))) {
+    const deletedCard = await Card.findByIdAndRemove(req.params.id).populate(['owner', 'likes']);
+    if (!deletedCard) {
       throw new Error('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
-      .send(await Card.findByIdAndRemove(req.params.Id).populate(['owner', 'likes']));
+      .send(deletedCard);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
@@ -45,15 +48,16 @@ exports.deleteCard = async (req, res) => {
 exports.putLike = async (req, res) => {
   try {
     const likeOwner = req.body.id;
-    if (!(await Card.findById(req.params.Id))) {
+    const likedCard = await Card.findByIdAndUpdate(
+      req.params.id,
+      { $addToSet: { likes: likeOwner } },
+      { new: true },
+    ).populate(['owner', 'likes']);
+    if (!likedCard) {
       throw new Error('not found');
     }
     res.status(httpConstants.HTTP_STATUS_CREATED)
-      .send(await Card.findByIdAndUpdate(
-        req.params.Id,
-        { $addToSet: { likes: likeOwner } },
-        { new: true },
-      ).populate(['owner', 'likes']));
+      .send(likedCard);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
@@ -68,15 +72,16 @@ exports.putLike = async (req, res) => {
 exports.deleteLike = async (req, res) => {
   try {
     const likeOwner = req.body.id;
-    if (!(await Card.findById(req.params.Id))) {
+    const unlikedCard = await Card.findByIdAndUpdate(
+      req.params.id,
+      { $pull: { likes: likeOwner } },
+      { new: true },
+    ).populate(['owner', 'likes']);
+    if (!unlikedCard) {
       throw new Error('not found');
     }
     res.status(httpConstants.HTTP_STATUS_CREATED)
-      .send(await Card.findByIdAndUpdate(
-        req.params.Id,
-        { $pull: { likes: likeOwner } },
-        { new: true },
-      ).populate(['owner', 'likes']));
+      .send(unlikedCard);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
