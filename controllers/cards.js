@@ -80,7 +80,7 @@ exports.deleteLike = async (req, res) => {
     if (!unlikedCard) {
       throw new Error('not found');
     }
-    res.status(httpConstants.HTTP_STATUS_CREATED)
+    res.status(httpConstants.HTTP_STATUS_OK)
       .send(unlikedCard);
   } catch (err) {
     if (err.name === 'CastError') {
