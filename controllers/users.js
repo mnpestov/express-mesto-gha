@@ -50,7 +50,7 @@ exports.createUser = async (req, res) => {
 exports.updateUser = async (req, res) => {
   try {
     const { name, about } = req.body;
-    if (!User.findById(req.user._id)) {
+    if (!(await User.findById(req.user._id))) {
       throw new Error('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
@@ -75,7 +75,7 @@ exports.updateUser = async (req, res) => {
 exports.updateAvatar = async (req, res) => {
   try {
     const { avatar } = req.body;
-    if (!User.findById(req.user._id)) {
+    if ((await !User.findById(req.user._id))) {
       throw new Error('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
