@@ -49,7 +49,7 @@ exports.putLike = async (req, res) => {
   try {
     const likeOwner = req.body.id;
     const likedCard = await Card.findByIdAndUpdate(
-      req.params.id,
+      req.params.Id,
       { $addToSet: { likes: likeOwner } },
       { new: true },
     ).populate(['owner', 'likes']);
@@ -73,7 +73,7 @@ exports.deleteLike = async (req, res) => {
   try {
     const likeOwner = req.body.id;
     const unlikedCard = await Card.findByIdAndUpdate(
-      req.params.id,
+      req.params.Id,
       { $pull: { likes: likeOwner } },
       { new: true },
     ).populate(['owner', 'likes']);
