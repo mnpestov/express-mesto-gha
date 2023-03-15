@@ -41,19 +41,19 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error('not found');
+      throw new Error('unauthorized');
     }
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
-      throw new Error('not found');
+      throw new Error('unauthorized');
     }
     const token = jwt.sign({ _id: user._id }, 'some-secret-key');
-    res.status()
+    res.status(httpConstants.HTTP_STATUS_OK)
       .send({ token });
   } catch (err) {
-    if (err.message === 'not found') {
-      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-        .send({ message: 'Пользователь с указанным id не найден', ...err });
+    if (err.message === 'unauthorized') {
+      res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
+        .send({ message: 'Не верный логин или пароль', ...err });
     } else {
       res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
         .send({ message: 'Ошибка на сервере', ...err });
