@@ -1,5 +1,9 @@
 const httpConstants = require('http2').constants;
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const { User } = require('../models/user');
+
+const SOLT_ROUNDS = 10;
 
 exports.getUsers = async (req, res) => {
   try {
@@ -32,11 +36,54 @@ exports.getUserById = async (req, res) => {
     }
   }
 };
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      throw new Error('not found');
+    }
+    const matched = await bcrypt.compare(password, user.password);
+    if (!matched) {
+      throw new Error('not found');
+    }
+    const token = jwt.sign({ _id: user._id }, 'some-secret-key');
+    res.status()
+      .send({ token });
+  } catch (err) {
+    if (err.message === 'not found') {
+      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+        .send({ message: 'Пользователь с указанным id не найден', ...err });
+    } else {
+      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send({ message: 'Ошибка на сервере', ...err });
+    }
+  }
+};
 exports.createUser = async (req, res) => {
   try {
-    const { name, about, avatar } = req.body;
+    const {
+      email,
+      password,
+      name,
+      about,
+      avatar,
+    } = req.body;
+    const hash = await bcrypt.hash(password, SOLT_ROUNDS);
+    const newUser = await User.create({
+      email,
+      password: hash,
+      name,
+      about,
+      avatar,
+    });
     res.status(httpConstants.HTTP_STATUS_CREATED)
-      .send(await User.create({ name, about, avatar }));
+      .send({
+        email: newUser.email,
+        name: newUser.name,
+        about: newUser.about,
+        avatar: newUser.avatar,
+      });
   } catch (err) {
     if (err.name === 'ValidationError') {
       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
