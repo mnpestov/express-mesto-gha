@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models/user');
 
 const SOLT_ROUNDS = 10;
+const JWT_SOLT = 'wotj21ds0f7!hjhjh^';
 
 exports.getUsers = async (req, res) => {
   try {
@@ -15,9 +16,30 @@ exports.getUsers = async (req, res) => {
       .send({ message: 'Ошибка на сервере', ...err });
   }
 };
-exports.getUserById = async (req, res) => {
+// exports.getUserById = async (req, res) => {
+//   try {
+//     const userById = await User.findById(req.params.id);
+//     if (!userById) {
+//       throw new Error('not found');
+//     }
+//     res.status(httpConstants.HTTP_STATUS_OK)
+//       .send(userById);
+//   } catch (err) {
+//     if (err.name === 'CastError') {
+//       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
+//         .send({ message: 'Ошибка валидации id', ...err });
+//     } else if (err.message === 'not found') {
+//       res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+//         .send({ message: 'Пользователь с указанным id не найден', ...err });
+//     } else {
+//       res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+//         .send({ message: 'Ошибка на сервере', ...err });
+//     }
+//   }
+// };
+exports.getUserInfo = async (req, res) => {
   try {
-    const userById = await User.findById(req.params.id);
+    const userById = await User.findById(req.user._id);
     if (!userById) {
       throw new Error('not found');
     }
@@ -39,7 +61,7 @@ exports.getUserById = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('+password');
     if (!user) {
       throw new Error('unauthorized');
     }
@@ -47,7 +69,7 @@ exports.login = async (req, res) => {
     if (!matched) {
       throw new Error('unauthorized');
     }
-    const token = jwt.sign({ _id: user._id }, 'some-secret-key');
+    const token = jwt.sign({ _id: user._id }, JWT_SOLT, { expiresIn: '7d' });
     res.status(httpConstants.HTTP_STATUS_OK)
       .send({ token });
   } catch (err) {

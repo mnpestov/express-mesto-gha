@@ -1,18 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { routes } = require('./routes');
+const {
+  createUser,
+  login,
+} = require('./controllers/users');
+const auth = require('./middlewares/auth');
 
 const app = express();
 
 const { PORT = 3000 } = process.env;
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '63da7cc031a5c5da7b306101',
-  };
-  next();
-});
-
+app.post('/signin', express.json(), login);
+app.post('/signup', createUser);
+app.use(auth);
 app.use(routes);
 
 async function connect() {
