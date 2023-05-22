@@ -1,5 +1,7 @@
 const httpConstants = require('http2').constants;
 const { Card } = require('../models/card');
+const NotFoundError = require('../errors/not-found-errors');
+const ForbidenError = require('../errors/forbiden-errors');
 
 exports.getCards = async (req, res, next) => {
   try {
@@ -26,17 +28,17 @@ exports.deleteCard = async (req, res, next) => {
   try {
     const сard = await Card.findById(req.params.id).populate(['owner', 'likes']);
     if (!сard) {
-      throw new Error('not found');
+      throw new NotFoundError('card not found');
     }
     if (сard.owner._id.toString() === req.user._id) {
       const deletedCard = await Card.findByIdAndDelete(req.params.id).populate(['owner', 'likes']);
       if (!deletedCard) {
-        throw new Error('not found');
+        throw new NotFoundError('card not found');
       }
       res.status(httpConstants.HTTP_STATUS_OK)
         .send(deletedCard);
     } else {
-      throw new Error('OwnerID does not match cardID');
+      throw new ForbidenError('OwnerID does not match cardID');
     }
   } catch (err) {
     next(err);
@@ -45,19 +47,19 @@ exports.deleteCard = async (req, res, next) => {
 exports.putLike = async (req, res, next) => {
   try {
     const likeOwner = req.user._id;
-    const сard = await Card.findById(req.params.id);
-    if (!сard) {
-      throw new Error('card not found');
-    }
+    // const сard = await Card.findById(req.params.id);
+    // if (!сard) {
+    //   throw new Error('card not found');
+    // }
     const likedCard = await Card.findByIdAndUpdate(
       req.params.id,
       { $addToSet: { likes: likeOwner } },
       { new: true },
     ).populate(['owner', 'likes']);
     if (!likedCard) {
-      throw new Error('card not found');
+      throw new NotFoundError('card not found');
     }
-    res.status(httpConstants.HTTP_STATUS_CREATED)
+    res.status(httpConstants.HTTP_STATUS_OK)
       .send(likedCard);
   } catch (err) {
     next(err);
@@ -65,10 +67,10 @@ exports.putLike = async (req, res, next) => {
 };
 exports.deleteLike = async (req, res, next) => {
   try {
-    const сard = await Card.findById(req.params.id);
-    if (!сard) {
-      throw new Error('card not found');
-    }
+    // const сard = await Card.findById(req.params.id);
+    // if (!сard) {
+    //   throw new Error('card not found');
+    // }
     const likeOwner = req.user._id;
     const unlikedCard = await Card.findByIdAndUpdate(
       req.params.id,
@@ -76,7 +78,7 @@ exports.deleteLike = async (req, res, next) => {
       { new: true },
     ).populate(['owner', 'likes']);
     if (!unlikedCard) {
-      throw new Error('card not found');
+      throw new NotFoundError('card not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(unlikedCard);

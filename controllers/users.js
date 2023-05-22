@@ -2,6 +2,8 @@ const httpConstants = require('http2').constants;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../models/user');
+const NotFoundError = require('../errors/not-found-errors');
+const UnauthorizedError = require('../errors/unauthorized-erros');
 
 const SOLT_ROUNDS = 10;
 const JWT_SOLT = 'wotj21ds0f7!hjhjh^';
@@ -19,7 +21,7 @@ exports.getUserById = async (req, res, next) => {
   try {
     const userById = await User.findById(req.params.id);
     if (!userById) {
-      throw new Error('not found');
+      throw new NotFoundError('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(userById);
@@ -31,7 +33,7 @@ exports.getUserInfo = async (req, res, next) => {
   try {
     const userById = await User.findById(req.user._id);
     if (!userById) {
-      throw new Error('not found');
+      throw new NotFoundError('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(userById);
@@ -44,24 +46,17 @@ exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      throw new Error('unauthorized');
+      throw new UnauthorizedError('wrong login or password');
     }
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
-      throw new Error('unauthorized');
+      throw new UnauthorizedError('wrong login or password');
     }
     const token = jwt.sign({ _id: user._id }, JWT_SOLT, { expiresIn: '7d' });
     res.status(httpConstants.HTTP_STATUS_OK)
       .send({ token });
   } catch (err) {
     next(err);
-    // if (err.message === 'unauthorized') {
-    //   res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
-    //     .send({ message: 'Не верный логин или пароль', ...err });
-    // } else {
-    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-    //     .send({ message: 'Ошибка на сервере', ...err });
-    // }
   }
 };
 exports.createUser = async (req, res, next) => {
@@ -90,13 +85,6 @@ exports.createUser = async (req, res, next) => {
       });
   } catch (err) {
     next(err);
-    // if (err.name === 'ValidationError') {
-    //   res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-    //     .send({ message: 'Ошибка валидации полей', ...err });
-    // } else {
-    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-    //     .send({ message: 'Ошибка на сервере', ...err });
-    // }
   }
 };
 exports.updateUser = async (req, res, next) => {
@@ -108,22 +96,12 @@ exports.updateUser = async (req, res, next) => {
       { new: true, runValidators: true },
     );
     if (!updatedUser) {
-      throw new Error('not found');
+      throw new NotFoundError('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(updatedUser);
   } catch (err) {
     next(err);
-    // if (err.name === 'ValidationError') {
-    //   res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-    //     .send({ message: 'Ошибка валидации полей', ...err });
-    // } else if (err.message === 'not found') {
-    //   res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-    //     .send({ message: 'Пользователь с указанным id не найден', ...err });
-    // } else {
-    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-    //     .send({ message: 'Ошибка на сервере', ...err });
-    // }
   }
 };
 exports.updateAvatar = async (req, res, next) => {
@@ -135,21 +113,11 @@ exports.updateAvatar = async (req, res, next) => {
       { new: true, runValidators: true },
     );
     if (!updatedAvatar) {
-      throw new Error('not found');
+      throw new NotFoundError('not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(updatedAvatar);
   } catch (err) {
     next(err);
-    // if (err.name === 'ValidationError') {
-    //   res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-    //     .send({ message: 'Ошибка валидации полей', ...err });
-    // } else if (err.message === 'not found') {
-    //   res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-    //     .send({ message: 'Пользователь с указанным id не найден', ...err });
-    // } else {
-    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-    //     .send({ message: 'Ошибка на сервере', ...err });
-    // }
   }
 };
