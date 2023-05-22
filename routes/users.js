@@ -13,7 +13,7 @@ const userRoutes = express.Router();
 
 userRoutes.get('/', getUsers);
 userRoutes.get('/:id', getUserById);
-userRoutes.get('/me', express.json(), getUserInfo);
+userRoutes.get('/me', getUserInfo);
 userRoutes.patch('/me', express.json(), celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
