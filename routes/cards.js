@@ -19,17 +19,17 @@ cardRoutes.post('/', express.json(), celebrate({
 }), createCard);
 cardRoutes.delete('/:id', celebrate({
   body: Joi.object().keys({
-    id: Joi.string().hex(),
+    _id: Joi.string().hex(),
   }),
 }), deleteCard);
 cardRoutes.put('/:Id/likes', express.json(), celebrate({
   body: Joi.object().keys({
-    id: Joi.string().hex(),
+    _id: Joi.string().hex(),
   }),
 }), putLike);
 cardRoutes.delete('/:Id/likes', express.json(), celebrate({
   body: Joi.object().keys({
-    id: Joi.string().hex(),
+    _id: Joi.string().hex(),
   }),
 }), deleteLike);
 
