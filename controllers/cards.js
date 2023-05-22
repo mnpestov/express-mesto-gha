@@ -50,7 +50,7 @@ exports.putLike = async (req, res, next) => {
       throw new Error('card not found');
     }
     const likedCard = await Card.findByIdAndUpdate(
-      req.params.Id,
+      req.params.id,
       { $addToSet: { likes: likeOwner } },
       { new: true },
     ).populate(['owner', 'likes']);
@@ -71,7 +71,7 @@ exports.deleteLike = async (req, res, next) => {
     }
     const likeOwner = req.user._id;
     const unlikedCard = await Card.findByIdAndUpdate(
-      req.params.Id,
+      req.params.id,
       { $pull: { likes: likeOwner } },
       { new: true },
     ).populate(['owner', 'likes']);
