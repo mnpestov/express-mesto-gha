@@ -22,12 +22,12 @@ cardRoutes.delete('/:id', celebrate({
     id: Joi.string().hex().length(24),
   }),
 }), deleteCard);
-cardRoutes.put('/:Id/likes', express.json(), celebrate({
+cardRoutes.put('/:id/likes', express.json(), celebrate({
   params: Joi.object().keys({
     id: Joi.string().hex().length(24),
   }),
 }), putLike);
-cardRoutes.delete('/:Id/likes', express.json(), celebrate({
+cardRoutes.delete('/:id/likes', express.json(), celebrate({
   params: Joi.object().keys({
     id: Joi.string().hex().length(24),
   }),
