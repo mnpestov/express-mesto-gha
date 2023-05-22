@@ -65,6 +65,10 @@ exports.putLike = async (req, res, next) => {
 };
 exports.deleteLike = async (req, res, next) => {
   try {
+    const сard = await Card.findById(req.params.id);
+    if (!сard) {
+      throw new Error('not found');
+    }
     const likeOwner = req.user._id;
     const unlikedCard = await Card.findByIdAndUpdate(
       req.params.Id,
