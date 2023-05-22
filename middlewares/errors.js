@@ -23,7 +23,7 @@ module.exports = ((err, req, res, next) => {
     res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
       .send({ message: 'С токеном что-то не так', ...err });
   } else if (err.message === 'OwnerID does not match cardID') {
-    res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
+    res.status(httpConstants.HTTP_STATUS_FORBIDDEN)
       .send({ message: 'ID владельца карточки не совпадает с ID карты', ...err });
   } else {
     res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
