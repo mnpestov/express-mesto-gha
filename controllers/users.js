@@ -28,10 +28,7 @@ exports.getUserById = async (req, res, next) => {
   }
 };
 exports.getUserInfo = async (req, res, next) => {
-  console.log(req);
-  console.log('go');
   try {
-    console.log(req);
     const userById = await User.findById(req.user._id);
     if (!userById) {
       throw new Error('not found');

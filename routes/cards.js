@@ -17,8 +17,20 @@ cardRoutes.post('/', express.json(), celebrate({
     link: Joi.string().required().pattern(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/),
   }),
 }), createCard);
-cardRoutes.delete('/:id', deleteCard);
-cardRoutes.put('/:Id/likes', express.json(), putLike);
-cardRoutes.delete('/:Id/likes', express.json(), deleteLike);
+cardRoutes.delete('/:id', celebrate({
+  body: Joi.object().keys({
+    id: Joi.objectId(),
+  }),
+}), deleteCard);
+cardRoutes.put('/:Id/likes', express.json(), celebrate({
+  body: Joi.object().keys({
+    id: Joi.objectId(),
+  }),
+}), putLike);
+cardRoutes.delete('/:Id/likes', express.json(), celebrate({
+  body: Joi.object().keys({
+    id: Joi.objectId(),
+  }),
+}), deleteLike);
 
 exports.cardRoutes = cardRoutes;
