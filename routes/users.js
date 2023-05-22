@@ -15,7 +15,7 @@ userRoutes.get('/', getUsers);
 userRoutes.get('/me', getUserInfo);
 userRoutes.get('/:id', celebrate({
   body: Joi.object().keys({
-    id: Joi.objectId(),
+    id: Joi.string().hex(),
   }),
 }), getUserById);
 userRoutes.patch('/me', express.json(), celebrate({
