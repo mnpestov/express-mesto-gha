@@ -1,16 +1,16 @@
 const httpConstants = require('http2').constants;
 const { Card } = require('../models/card');
 
-exports.getCards = async (req, res) => {
+exports.getCards = async (req, res, next) => {
   try {
     const cards = await Card.find({}).populate(['owner', 'likes']);
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(cards);
   } catch (err) {
-    res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на сервере', ...err });
+    next(err);
   }
 };
-exports.createCard = async (req, res) => {
+exports.createCard = async (req, res, next) => {
   try {
     const { name, link } = req.body;
     const owner = req.user._id;
@@ -19,35 +19,30 @@ exports.createCard = async (req, res) => {
     res.status(httpConstants.HTTP_STATUS_CREATED)
       .send(card);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST).send({ message: 'Ошибка валидации полей', ...err });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
-exports.deleteCard = async (req, res) => {
+exports.deleteCard = async (req, res, next) => {
   try {
-    const deletedCard = await Card.findByIdAndRemove(req.params.id).populate(['owner', 'likes']);
-    if (!deletedCard) {
-      throw new Error('not found');
+    const сard = await Card.findById(req.params.id).populate(['owner', 'likes']);
+    if (сard.owner._id.toString() === req.user._id) {
+      console.log('Owner ID is the same as Card ID');
+      const deletedCard = await Card.findByIdAndDelete(req.params.id).populate(['owner', 'likes']);
+      if (!deletedCard) {
+        throw new Error('not found');
+      }
+      res.status(httpConstants.HTTP_STATUS_OK)
+        .send(deletedCard);
+    } else {
+      throw new Error('OwnerID does not match cardID');
     }
-    res.status(httpConstants.HTTP_STATUS_OK)
-      .send(deletedCard);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-        .send({ message: 'Ошибка валидации id', ...err });
-    } else if (err.message === 'not found') {
-      res.status(httpConstants.HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указанным id не найдена.' });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
-exports.putLike = async (req, res) => {
+exports.putLike = async (req, res, next) => {
   try {
-    const likeOwner = req.body.id;
+    const likeOwner = req.user._id;
     const likedCard = await Card.findByIdAndUpdate(
       req.params.Id,
       { $addToSet: { likes: likeOwner } },
@@ -59,19 +54,12 @@ exports.putLike = async (req, res) => {
     res.status(httpConstants.HTTP_STATUS_CREATED)
       .send(likedCard);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-        .send({ message: 'Ошибка валидации id', ...err });
-    } else if (err.message === 'not found') {
-      res.status(httpConstants.HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указанным id не найдена.' });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
-exports.deleteLike = async (req, res) => {
+exports.deleteLike = async (req, res, next) => {
   try {
-    const likeOwner = req.body.id;
+    const likeOwner = req.user._id;
     const unlikedCard = await Card.findByIdAndUpdate(
       req.params.Id,
       { $pull: { likes: likeOwner } },
@@ -83,13 +71,6 @@ exports.deleteLike = async (req, res) => {
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(unlikedCard);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-        .send({ message: 'Ошибка валидации id', ...err });
-    } else if (err.message === 'not found') {
-      res.status(httpConstants.HTTP_STATUS_NOT_FOUND).send({ message: 'Карточка с указанным id не найдена.' });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR).send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };

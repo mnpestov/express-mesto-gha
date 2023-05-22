@@ -6,38 +6,17 @@ const { User } = require('../models/user');
 const SOLT_ROUNDS = 10;
 const JWT_SOLT = 'wotj21ds0f7!hjhjh^';
 
-exports.getUsers = async (req, res) => {
+exports.getUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(users);
   } catch (err) {
-    res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-      .send({ message: 'Ошибка на сервере', ...err });
+    next(err);
   }
 };
-// exports.getUserById = async (req, res) => {
-//   try {
-//     const userById = await User.findById(req.params.id);
-//     if (!userById) {
-//       throw new Error('not found');
-//     }
-//     res.status(httpConstants.HTTP_STATUS_OK)
-//       .send(userById);
-//   } catch (err) {
-//     if (err.name === 'CastError') {
-//       res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-//         .send({ message: 'Ошибка валидации id', ...err });
-//     } else if (err.message === 'not found') {
-//       res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-//         .send({ message: 'Пользователь с указанным id не найден', ...err });
-//     } else {
-//       res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-//         .send({ message: 'Ошибка на сервере', ...err });
-//     }
-//   }
-// };
-exports.getUserInfo = async (req, res) => {
+
+exports.getUserInfo = async (req, res, next) => {
   try {
     const userById = await User.findById(req.user._id);
     if (!userById) {
@@ -46,19 +25,10 @@ exports.getUserInfo = async (req, res) => {
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(userById);
   } catch (err) {
-    if (err.name === 'CastError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-        .send({ message: 'Ошибка валидации id', ...err });
-    } else if (err.message === 'not found') {
-      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-        .send({ message: 'Пользователь с указанным id не найден', ...err });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
@@ -73,16 +43,10 @@ exports.login = async (req, res) => {
     res.status(httpConstants.HTTP_STATUS_OK)
       .send({ token });
   } catch (err) {
-    if (err.message === 'unauthorized') {
-      res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
-        .send({ message: 'Не верный логин или пароль', ...err });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
-exports.createUser = async (req, res) => {
+exports.createUser = async (req, res, next) => {
   try {
     const {
       email,
@@ -107,16 +71,10 @@ exports.createUser = async (req, res) => {
         avatar: newUser.avatar,
       });
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-        .send({ message: 'Ошибка валидации полей', ...err });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
-exports.updateUser = async (req, res) => {
+exports.updateUser = async (req, res, next) => {
   try {
     const { name, about } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
@@ -130,19 +88,10 @@ exports.updateUser = async (req, res) => {
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(updatedUser);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-        .send({ message: 'Ошибка валидации полей', ...err });
-    } else if (err.message === 'not found') {
-      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-        .send({ message: 'Пользователь с указанным id не найден', ...err });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
-exports.updateAvatar = async (req, res) => {
+exports.updateAvatar = async (req, res, next) => {
   try {
     const { avatar } = req.body;
     const updatedAvatar = await User.findByIdAndUpdate(
@@ -156,15 +105,6 @@ exports.updateAvatar = async (req, res) => {
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(updatedAvatar);
   } catch (err) {
-    if (err.name === 'ValidationError') {
-      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-        .send({ message: 'Ошибка валидации полей', ...err });
-    } else if (err.message === 'not found') {
-      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-        .send({ message: 'Пользователь с указанным id не найден', ...err });
-    } else {
-      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-        .send({ message: 'Ошибка на сервере', ...err });
-    }
+    next(err);
   }
 };
