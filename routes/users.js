@@ -3,7 +3,7 @@ const express = require('express');
 const { celebrate, Joi } = require('celebrate');
 const {
   getUsers,
-  // getUserById,
+  getUserById,
   getUserInfo,
   updateUser,
   updateAvatar,
@@ -12,7 +12,7 @@ const {
 const userRoutes = express.Router();
 
 userRoutes.get('/', getUsers);
-// userRoutes.get('/:id', getUserById);
+userRoutes.get('/:id', getUserById);
 userRoutes.get('/me', express.json(), getUserInfo);
 userRoutes.patch('/me', express.json(), celebrate({
   body: Joi.object().keys({

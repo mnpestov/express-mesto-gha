@@ -7,9 +7,12 @@ module.exports = ((err, req, res, next) => {
   } else if (err.message === 'not found') {
     res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
       .send({ message: 'Пользователь с указанным id не найден', ...err });
-  } else if (err.message === 'unauthorized') {
+  } else if (err.message === 'wrong login or password') {
     res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
       .send({ message: 'Не верный логин или пароль', ...err });
+  } else if (err.message === 'unauthorized') {
+    res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
+      .send({ message: 'Необходима авторизация', ...err });
   } else if (err.name === 'ValidationError') {
     res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
       .send({ message: 'Ошибка валидации полей', ...err });

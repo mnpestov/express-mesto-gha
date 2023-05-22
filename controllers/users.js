@@ -15,7 +15,27 @@ exports.getUsers = async (req, res, next) => {
     next(err);
   }
 };
-
+exports.getUserById = async (req, res) => {
+  try {
+    const userById = await User.findById(req.params.id);
+    if (!userById) {
+      throw new Error('not found');
+    }
+    res.status(httpConstants.HTTP_STATUS_OK)
+      .send(userById);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
+        .send({ message: 'Ошибка валидации id', ...err });
+    } else if (err.message === 'not found') {
+      res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+        .send({ message: 'Пользователь с указанным id не найден', ...err });
+    } else {
+      res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+        .send({ message: 'Ошибка на сервере', ...err });
+    }
+  }
+};
 exports.getUserInfo = async (req, res, next) => {
   try {
     const userById = await User.findById(req.user._id);
@@ -26,6 +46,16 @@ exports.getUserInfo = async (req, res, next) => {
       .send(userById);
   } catch (err) {
     next(err);
+    // if (err.name === 'CastError') {
+    //   res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
+    //     .send({ message: 'Ошибка валидации id', ...err });
+    // } else if (err.message === 'not found') {
+    //   res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+    //     .send({ message: 'Пользователь с указанным id не найден', ...err });
+    // } else {
+    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    //     .send({ message: 'Ошибка на сервере', ...err });
+    // }
   }
 };
 exports.login = async (req, res, next) => {
@@ -44,6 +74,13 @@ exports.login = async (req, res, next) => {
       .send({ token });
   } catch (err) {
     next(err);
+    // if (err.message === 'unauthorized') {
+    //   res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
+    //     .send({ message: 'Не верный логин или пароль', ...err });
+    // } else {
+    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    //     .send({ message: 'Ошибка на сервере', ...err });
+    // }
   }
 };
 exports.createUser = async (req, res, next) => {
@@ -72,6 +109,13 @@ exports.createUser = async (req, res, next) => {
       });
   } catch (err) {
     next(err);
+    // if (err.name === 'ValidationError') {
+    //   res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
+    //     .send({ message: 'Ошибка валидации полей', ...err });
+    // } else {
+    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    //     .send({ message: 'Ошибка на сервере', ...err });
+    // }
   }
 };
 exports.updateUser = async (req, res, next) => {
@@ -89,6 +133,16 @@ exports.updateUser = async (req, res, next) => {
       .send(updatedUser);
   } catch (err) {
     next(err);
+    // if (err.name === 'ValidationError') {
+    //   res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
+    //     .send({ message: 'Ошибка валидации полей', ...err });
+    // } else if (err.message === 'not found') {
+    //   res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+    //     .send({ message: 'Пользователь с указанным id не найден', ...err });
+    // } else {
+    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    //     .send({ message: 'Ошибка на сервере', ...err });
+    // }
   }
 };
 exports.updateAvatar = async (req, res, next) => {
@@ -106,5 +160,15 @@ exports.updateAvatar = async (req, res, next) => {
       .send(updatedAvatar);
   } catch (err) {
     next(err);
+    // if (err.name === 'ValidationError') {
+    //   res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
+    //     .send({ message: 'Ошибка валидации полей', ...err });
+    // } else if (err.message === 'not found') {
+    //   res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+    //     .send({ message: 'Пользователь с указанным id не найден', ...err });
+    // } else {
+    //   res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
+    //     .send({ message: 'Ошибка на сервере', ...err });
+    // }
   }
 };
