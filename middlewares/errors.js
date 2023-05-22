@@ -7,6 +7,9 @@ module.exports = ((err, req, res, next) => {
   } else if (err.message === 'not found') {
     res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
       .send({ message: 'Пользователь с указанным id не найден', ...err });
+  } else if (err.message === 'card not found') {
+    res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+      .send({ message: 'Карточка с указанным id не найдена', ...err });
   } else if (err.message === 'wrong login or password') {
     res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
       .send({ message: 'Не верный логин или пароль', ...err });

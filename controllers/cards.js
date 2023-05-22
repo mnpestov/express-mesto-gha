@@ -47,7 +47,7 @@ exports.putLike = async (req, res, next) => {
     const likeOwner = req.user._id;
     const сard = await Card.findById(req.params.id);
     if (!сard) {
-      throw new Error('not found');
+      throw new Error('card not found');
     }
     const likedCard = await Card.findByIdAndUpdate(
       req.params.Id,
@@ -55,7 +55,7 @@ exports.putLike = async (req, res, next) => {
       { new: true },
     ).populate(['owner', 'likes']);
     if (!likedCard) {
-      throw new Error('not found');
+      throw new Error('card not found');
     }
     res.status(httpConstants.HTTP_STATUS_CREATED)
       .send(likedCard);
@@ -67,7 +67,7 @@ exports.deleteLike = async (req, res, next) => {
   try {
     const сard = await Card.findById(req.params.id);
     if (!сard) {
-      throw new Error('not found');
+      throw new Error('card not found');
     }
     const likeOwner = req.user._id;
     const unlikedCard = await Card.findByIdAndUpdate(
@@ -76,7 +76,7 @@ exports.deleteLike = async (req, res, next) => {
       { new: true },
     ).populate(['owner', 'likes']);
     if (!unlikedCard) {
-      throw new Error('not found');
+      throw new Error('card not found');
     }
     res.status(httpConstants.HTTP_STATUS_OK)
       .send(unlikedCard);
