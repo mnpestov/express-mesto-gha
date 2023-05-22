@@ -25,6 +25,9 @@ exports.createCard = async (req, res, next) => {
 exports.deleteCard = async (req, res, next) => {
   try {
     const сard = await Card.findById(req.params.id).populate(['owner', 'likes']);
+    if (!сard) {
+      throw new Error('not found');
+    }
     if (сard.owner._id.toString() === req.user._id) {
       const deletedCard = await Card.findByIdAndDelete(req.params.id).populate(['owner', 'likes']);
       if (!deletedCard) {
