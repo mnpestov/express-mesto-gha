@@ -45,6 +45,10 @@ exports.deleteCard = async (req, res, next) => {
 exports.putLike = async (req, res, next) => {
   try {
     const likeOwner = req.user._id;
+    const сard = await Card.findById(req.params.id);
+    if (!сard) {
+      throw new Error('not found');
+    }
     const likedCard = await Card.findByIdAndUpdate(
       req.params.Id,
       { $addToSet: { likes: likeOwner } },
