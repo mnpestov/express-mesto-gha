@@ -26,7 +26,6 @@ exports.deleteCard = async (req, res, next) => {
   try {
     const сard = await Card.findById(req.params.id).populate(['owner', 'likes']);
     if (сard.owner._id.toString() === req.user._id) {
-      console.log('Owner ID is the same as Card ID');
       const deletedCard = await Card.findByIdAndDelete(req.params.id).populate(['owner', 'likes']);
       if (!deletedCard) {
         throw new Error('not found');
