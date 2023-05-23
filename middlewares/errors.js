@@ -3,34 +3,34 @@ const httpConstants = require('http2').constants;
 module.exports = ((err, req, res, next) => {
   if (err.name === 'CastError') {
     res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-      .send({ message: 'Ошибка валидации id', ...err });
+      .send({ message: 'Ошибка валидации id' });
   } else if (err.message === 'not found') {
     res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-      .send({ message: 'Пользователь с указанным id не найден', ...err });
+      .send({ message: 'Пользователь с указанным id не найден' });
   } else if (err.message === 'card not found') {
     res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
-      .send({ message: 'Карточка с указанным id не найдена', ...err });
+      .send({ message: 'Карточка с указанным id не найдена' });
   } else if (err.message === 'wrong login or password') {
     res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
-      .send({ message: 'Не верный логин или пароль', ...err });
+      .send({ message: 'Не верный логин или пароль' });
   } else if (err.message === 'unauthorized') {
     res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
-      .send({ message: 'Необходима авторизация', ...err });
+      .send({ message: 'Необходима авторизация' });
   } else if (err.name === 'ValidationError') {
     res.status(httpConstants.HTTP_STATUS_BAD_REQUEST)
-      .send({ message: 'Ошибка валидации полей', ...err });
-  } else if (err.code === 11000) {
-    res.status(httpConstants.HTTP_STATUS_CONFLICT)
-      .send({ message: 'Такой пользователь уже существует', ...err });
+      .send({ message: 'Ошибка валидации полей' });
   } else if (err.name === 'JsonWebTokenError') {
     res.status(httpConstants.HTTP_STATUS_UNAUTHORIZED)
-      .send({ message: 'С токеном что-то не так', ...err });
+      .send({ message: 'С токеном что-то не так' });
   } else if (err.message === 'OwnerID does not match cardID') {
     res.status(httpConstants.HTTP_STATUS_FORBIDDEN)
-      .send({ message: 'ID владельца карточки не совпадает с ID карты', ...err });
+      .send({ message: 'ID владельца карточки не совпадает с ID карты' });
+  } else if (err.message === 'Маршрут не найден') {
+    res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
+      .send({ message: 'Маршрут не найден' });
   } else {
     res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
-      .send({ message: 'Ошибка на сервере', ...err });
+      .send({ message: 'Ошибка на сервере' });
   }
 
   next();

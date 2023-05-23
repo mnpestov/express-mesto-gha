@@ -84,7 +84,12 @@ exports.createUser = async (req, res, next) => {
         avatar: newUser.avatar,
       });
   } catch (err) {
-    next(err);
+    if (err.code === 11000) {
+      res.status(httpConstants.HTTP_STATUS_CONFLICT)
+        .send({ message: 'Такой пользователь уже существует' });
+    } else {
+      next(err);
+    }
   }
 };
 exports.updateUser = async (req, res, next) => {

@@ -47,10 +47,6 @@ exports.deleteCard = async (req, res, next) => {
 exports.putLike = async (req, res, next) => {
   try {
     const likeOwner = req.user._id;
-    // const сard = await Card.findById(req.params.id);
-    // if (!сard) {
-    //   throw new Error('card not found');
-    // }
     const likedCard = await Card.findByIdAndUpdate(
       req.params.id,
       { $addToSet: { likes: likeOwner } },
@@ -67,10 +63,6 @@ exports.putLike = async (req, res, next) => {
 };
 exports.deleteLike = async (req, res, next) => {
   try {
-    // const сard = await Card.findById(req.params.id);
-    // if (!сard) {
-    //   throw new Error('card not found');
-    // }
     const likeOwner = req.user._id;
     const unlikedCard = await Card.findByIdAndUpdate(
       req.params.id,
