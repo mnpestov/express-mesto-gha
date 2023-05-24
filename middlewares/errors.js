@@ -28,6 +28,9 @@ module.exports = ((err, req, res, next) => {
   } else if (err.message === 'Маршрут не найден') {
     res.status(httpConstants.HTTP_STATUS_NOT_FOUND)
       .send({ message: 'Маршрут не найден' });
+  } else if (err.message === 'Такой пользователь уже существует') {
+    res.status(httpConstants.HTTP_STATUS_CONFLICT)
+      .send({ message: 'Такой пользователь уже существует' });
   } else {
     res.status(httpConstants.HTTP_STATUS_INTERNAL_SERVER_ERROR)
       .send({ message: 'Ошибка на сервере' });

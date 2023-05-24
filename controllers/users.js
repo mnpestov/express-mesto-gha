@@ -85,6 +85,7 @@ exports.createUser = async (req, res, next) => {
         avatar: newUser.avatar,
       });
   } catch (err) {
+    console.log(err.code);
     if (err.code === 11000) {
       next(new ConflictError('Такой пользователь уже существует'));
     } else {
