@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models/user');
 const NotFoundError = require('../errors/not-found-errors');
 const UnauthorizedError = require('../errors/unauthorized-erros');
+const ConflictError = require('../errors/conflict-errors');
 
 const SOLT_ROUNDS = 10;
 const JWT_SOLT = 'wotj21ds0f7!hjhjh^';
@@ -85,8 +86,7 @@ exports.createUser = async (req, res, next) => {
       });
   } catch (err) {
     if (err.code === 11000) {
-      res.status(httpConstants.HTTP_STATUS_CONFLICT)
-        .send({ message: 'Такой пользователь уже существует' });
+      next(new ConflictError('Такой пользователь уже существует'));
     } else {
       next(err);
     }
